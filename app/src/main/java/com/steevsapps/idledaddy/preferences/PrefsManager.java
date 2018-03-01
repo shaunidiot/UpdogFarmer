@@ -34,6 +34,8 @@ public class PrefsManager {
     private final static String INCLUDE_FREE_GAMES = "include_free_games";
     private final static String PERSONA_NAME = "persona_name";
     private final static String AVATAR_HASH = "avatar_hash";
+    private final static String API_KEY = "api_key";
+    private final static String LANGUAGE = "language";
 
     private static SharedPreferences prefs;
 
@@ -42,7 +44,7 @@ public class PrefsManager {
 
     public static void init(Context c) {
         if (prefs == null) {
-            prefs = PreferenceManager.getDefaultSharedPreferences(c.getApplicationContext());
+            prefs = PreferenceManager.getDefaultSharedPreferences(c);
 
             if (getMachineId().isEmpty()) {
                 // Generate machine id
@@ -102,6 +104,14 @@ public class PrefsManager {
 
     public static void writeAvatarHash(String avatarHash) {
         writePref(AVATAR_HASH, avatarHash);
+    }
+
+    public static void writeApiKey(String apiKey) {
+        writePref(API_KEY, apiKey);
+    }
+
+    public static void writeLanguage(String language) {
+        writePref(LANGUAGE, language);
     }
 
     public static String getUsername() {
@@ -167,6 +177,14 @@ public class PrefsManager {
 
     public static boolean includeFreeGames() {
         return prefs.getBoolean(INCLUDE_FREE_GAMES, false);
+    }
+
+    public static String getApiKey() {
+        return prefs.getString(API_KEY, "");
+    }
+
+    public static String getLanguage() {
+        return prefs.getString(LANGUAGE, "");
     }
 
     private static void writePref(String key, String value) {

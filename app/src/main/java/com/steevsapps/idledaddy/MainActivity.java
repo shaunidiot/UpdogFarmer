@@ -17,6 +17,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -36,7 +37,6 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
-import com.steevsapps.idledaddy.base.BaseActivity;
 import com.steevsapps.idledaddy.billing.BillingManager;
 import com.steevsapps.idledaddy.billing.BillingUpdatesListener;
 import com.steevsapps.idledaddy.dialogs.AboutDialog;
@@ -82,6 +82,7 @@ public class MainActivity extends BaseActivity implements BillingUpdatesListener
     private ActionBarDrawerToggle drawerToggle;
     private ImageView logoutToggle;
     private Spinner spinnerNav;
+    private SearchView searchView;
     private ViewStub adInflater;
     private AdView adView;
 
@@ -438,13 +439,26 @@ public class MainActivity extends BaseActivity implements BillingUpdatesListener
         drawerView.getHeaderView(0).setClickable(loggedIn);
         menu.findItem(R.id.auto_discovery).setVisible(loggedIn);
         menu.findItem(R.id.auto_vote).setVisible(loggedIn);
+        menu.findItem(R.id.search).setVisible(drawerItemId == R.id.games);
         return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!searchView.isIconified()) {
+            // Dismiss the SearchView
+            searchView.setQuery("", false);
+            searchView.setIconified(true);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -626,6 +640,8 @@ public class MainActivity extends BaseActivity implements BillingUpdatesListener
         } else if (key.equals("offline")) {
             // Change status
             steamService.changeStatus(PrefsManager.getOffline() ? EPersonaState.Offline : EPersonaState.Online);
+        } else if (key.equals("language")) {
+            Toast.makeText(this, R.string.language_changed, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -654,8 +670,6 @@ public class MainActivity extends BaseActivity implements BillingUpdatesListener
         }
         MobileAds.initialize(this, "ca-app-pub-6413501894389361~6190763130");
         final AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("0BCBCBBDA9FCA8FE47AEA0C5D1BCBE99")
-                .addTestDevice("E8F66CC8599C1F21FDBC86370F926F88")
                 .build();
         adView.loadAd(adRequest);
     }
